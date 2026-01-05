@@ -1,11 +1,9 @@
 from flask import Flask, request, render_template_string
-from gpiozero import Motor
+from gpiozero import CamJamKitRobot
 
-# Motors setup (update pins if needed)
-motor_left = Motor(forward=17, backward=18)
-motor_right = Motor(forward=22, backward=23)
+# Robot set up 
+robot = CamJamKitRobot()
 
-# Flask server
 app = Flask(__name__)
 
 HTML = """
@@ -40,22 +38,20 @@ def index():
 
 @app.route('/action')
 def action():
-    dir = request.args.get('dir')
-    if dir == 'forward':
-        motor_left.forward(0.6)
-        motor_right.forward(0.6)
-    elif dir == 'backward':
-        motor_left.backward(0.6)
-        motor_right.backward(0.6)
-    elif dir == 'left':
-        motor_left.forward(0.6)
-        motor_right.stop()
-    elif dir == 'right':
-        motor_left.stop()
-        motor_right.forward(0.6)
-    elif dir == 'stop':
-        motor_left.stop()
-        motor_right.stop()
+    direction = request.args.get('dir')
+    speed = 0.6
+
+    if direction == 'forward':
+        robot.forward(speed)
+    elif direction == 'backward':
+        robot.backward(speed)
+    elif direction == 'left':
+        robot.left(speed)
+    elif direction == 'right':
+        robot.right(speed)
+    elif direction == 'stop':
+        robot.stop()
+
     return ('', 204)
 
 if __name__ == '__main__':
